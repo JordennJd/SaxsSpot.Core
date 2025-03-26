@@ -22,9 +22,9 @@ pipeline {
 
                     // Находим все файлы с расширением .csproj и заменяем строку с версией
                     sh """
-                        find ./* -type f -name '*.csproj' -print0 | while IFS= read -r '' file; do
-                          echo "Processing \$file"
-                          sed -i 's|{BuildNumber}|${buildNumber}|g' "\$file"
+                        find ./* -type f -name '*.csproj' | while IFS= read -r file; do
+                          echo "Processing $file"
+                          sed -i 's|{BuildNumber}|${buildNumber}|g' "$file"
                         done
                     """
                 }
