@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SaxsSpot.Core.Worker", "SaxsSpot.Core.Worker\SaxsSpot.Core.Worker.csproj", "{C45AC1D2-49AA-49C3-86D4-720BE18D715F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SaxsSpot.Core.Contracts", "SaxsSpot.Core.Contracts\SaxsSpot.Core.Contracts.csproj", "{F722D173-0211-4EC4-8DE5-DD0323FACC15}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SaxsSpot.Core.GenericStorage", "SaxsSpot.Core.GenericStorage\SaxsSpot.Core.GenericStorage.csproj", "{BF2CF17F-F131-4A0E-99F0-3D68BC4986D3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SaxsSpot.Core.CommonObjectStorage", "SaxsSpot.Core.CommonObjectStorage\SaxsSpot.Core.CommonObjectStorage.csproj", "{5CC9B0C0-65C1-4A4F-8C60-FA2D06447367}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C45AC1D2-49AA-49C3-86D4-720BE18D715F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C45AC1D2-49AA-49C3-86D4-720BE18D715F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C45AC1D2-49AA-49C3-86D4-720BE18D715F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C45AC1D2-49AA-49C3-86D4-720BE18D715F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F722D173-0211-4EC4-8DE5-DD0323FACC15}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F722D173-0211-4EC4-8DE5-DD0323FACC15}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F722D173-0211-4EC4-8DE5-DD0323FACC15}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F722D173-0211-4EC4-8DE5-DD0323FACC15}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BF2CF17F-F131-4A0E-99F0-3D68BC4986D3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BF2CF17F-F131-4A0E-99F0-3D68BC4986D3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BF2CF17F-F131-4A0E-99F0-3D68BC4986D3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BF2CF17F-F131-4A0E-99F0-3D68BC4986D3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5CC9B0C0-65C1-4A4F-8C60-FA2D06447367}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5CC9B0C0-65C1-4A4F-8C60-FA2D06447367}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5CC9B0C0-65C1-4A4F-8C60-FA2D06447367}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5CC9B0C0-65C1-4A4F-8C60-FA2D06447367}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal

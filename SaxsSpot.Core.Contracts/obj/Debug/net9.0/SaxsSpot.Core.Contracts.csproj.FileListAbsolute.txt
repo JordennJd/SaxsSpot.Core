@@ -1,0 +1,12 @@
+/Users/danilalatyrev/Desktop/ForProjects/SaxsSpot/SaxsSpot.Core/SaxsSpot.Core.Contracts/bin/Debug/net9.0/SaxsSpot.Core.Contracts.deps.json
+/Users/danilalatyrev/Desktop/ForProjects/SaxsSpot/SaxsSpot.Core/SaxsSpot.Core.Contracts/bin/Debug/net9.0/SaxsSpot.Core.Contracts.dll
+/Users/danilalatyrev/Desktop/ForProjects/SaxsSpot/SaxsSpot.Core/SaxsSpot.Core.Contracts/bin/Debug/net9.0/SaxsSpot.Core.Contracts.pdb
+/Users/danilalatyrev/Desktop/ForProjects/SaxsSpot/SaxsSpot.Core/SaxsSpot.Core.Contracts/obj/Debug/net9.0/SaxsSpot.Core.Contracts.csproj.AssemblyReference.cache
+/Users/danilalatyrev/Desktop/ForProjects/SaxsSpot/SaxsSpot.Core/SaxsSpot.Core.Contracts/obj/Debug/net9.0/SaxsSpot.Core.Contracts.GeneratedMSBuildEditorConfig.editorconfig
+/Users/danilalatyrev/Desktop/ForProjects/SaxsSpot/SaxsSpot.Core/SaxsSpot.Core.Contracts/obj/Debug/net9.0/SaxsSpot.Core.Contracts.AssemblyInfoInputs.cache
+/Users/danilalatyrev/Desktop/ForProjects/SaxsSpot/SaxsSpot.Core/SaxsSpot.Core.Contracts/obj/Debug/net9.0/SaxsSpot.Core.Contracts.AssemblyInfo.cs
+/Users/danilalatyrev/Desktop/ForProjects/SaxsSpot/SaxsSpot.Core/SaxsSpot.Core.Contracts/obj/Debug/net9.0/SaxsSpot.Core.Contracts.csproj.CoreCompileInputs.cache
+/Users/danilalatyrev/Desktop/ForProjects/SaxsSpot/SaxsSpot.Core/SaxsSpot.Core.Contracts/obj/Debug/net9.0/SaxsSpot.Core.Contracts.dll
+/Users/danilalatyrev/Desktop/ForProjects/SaxsSpot/SaxsSpot.Core/SaxsSpot.Core.Contracts/obj/Debug/net9.0/refint/SaxsSpot.Core.Contracts.dll
+/Users/danilalatyrev/Desktop/ForProjects/SaxsSpot/SaxsSpot.Core/SaxsSpot.Core.Contracts/obj/Debug/net9.0/SaxsSpot.Core.Contracts.pdb
+/Users/danilalatyrev/Desktop/ForProjects/SaxsSpot/SaxsSpot.Core/SaxsSpot.Core.Contracts/obj/Debug/net9.0/ref/SaxsSpot.Core.Contracts.dll
