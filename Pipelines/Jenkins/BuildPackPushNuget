@@ -14,19 +14,17 @@ pipeline {
             }
         }
 
-        stage('Update Version in csproj files') {
+        stage('Set Build Number') {
             steps {
                 script {
-                    def buildNumber = env.BUILD_NUMBER
-                    echo "Updating all csproj files to version 1.0.${buildNumber}"
-
-                    // Находим все файлы с расширением .csproj и заменяем строку с версией
-                    sh """
-                        find ./* -type f -name '*.csproj' | while IFS= read -r file; do
-                          echo "Processing $file"
-                          sed -i 's|{BuildNumber}|${buildNumber}|g' "$file"
-                        done
-                    """
+                    // Этот шаг выполняет поиск и замену
+                    step([
+                        $class: 'TextFinder', 
+                        fileSet: '**/*.csproj', 
+                        searchString: '{BuildNumber}', 
+                        replaceString: "${BUILD_NUMBER}", 
+                        updateOnlyIfMatching: false
+                    ])
                 }
             }
         }
