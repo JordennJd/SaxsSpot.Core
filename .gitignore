@@ -1,0 +1,64 @@
+# .NET build artifacts
+bin/
+obj/
+
+# User-specific files
+.vs/
+.idea/
+.vscode/
+
+# Windows Installer files
+*.cab
+*.msi
+*.msm
+*.msp
+
+# Windows Installer files
+Thumbs.db
+ehthumbs.db
+
+# ASP.NET temporary files
+aspnet_client/
+Nuget/
+# .NET Core
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+# .NET Core (CLI)
+dotnet-*.json
+
+# .NET Debugging Files
+.vscode/launch.json
+
+# User-specific files from Visual Studio for Mac
+.idea/
+
+# ASP.NET files
+wwwroot/
+
+# Exclude compiled DLLs and PDBs
+*.dll
+*.pdb
+
+# Exclude log files
+*.log
+
+# Exclude backup files and temporary files created by text editors
+*~
+*.bak
+*.swp
+
+# Exclude Visual Studio for Mac files
+.vscode/
+.idea/
+
+# User-specific files from JetBrains Rider
+.idea/
+
+# Visual Studio for Mac
+.vscode/
+
+# Exclude coverage and test results (if applicable)
+coverage/
+test-results/
