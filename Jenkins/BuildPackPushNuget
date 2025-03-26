@@ -1,0 +1,61 @@
+pipeline {
+    agent any
+
+    environment {
+        DOTNET_VERSION = '9.0'
+        NUGET_SOURCE = 'https://local.devspot.tech/git/api/packages/SaxsSpot/nuget/index.json' // Или URL твоего NuGet-репозитория
+        NUGET_API_KEY = credentials('nuget-api-key')  // Убедись, что API-ключ добавлен в Jenkins Credentials
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+
+        stage('Update Version in csproj files') {
+            steps {
+                script {
+                    def buildNumber = env.BUILD_NUMBER
+                    echo "Updating all csproj files to version 1.0.${buildNumber}"
+
+                    // Находим все файлы с расширением .csproj и заменяем строку с версией
+                    sh """
+                        find . -type f -name '*.csproj' -print0 | while IFS= read -r -d '' file; do
+                          echo "Processing \$file"
+                          sed -i 's|{BuildNumber}|${buildNumber}|g' "\$file"
+                        done
+                    """
+                }
+            }
+        }
+
+        stage('Build') {
+            steps {
+                sh 'dotnet build --configuration Release'
+            }
+        }
+
+        stage('Pack') {
+            steps {
+                sh 'dotnet pack --configuration Release --output nupkgs'
+            }
+        }
+
+        stage('Push to NuGet') {
+            steps {
+                sh 'dotnet nuget push nupkgs/*.nupkg --source ${NUGET_SOURCE} --api-key ${NUGET_API_KEY} --skip-duplicate'
+            }
+        }
+    }
+
+    post {
+        success {
+            echo "✅ Build ${env.BUILD_NUMBER} successful!"
+        }
+        failure {
+            echo "❌ Build failed!"
+        }
+    }
+}
