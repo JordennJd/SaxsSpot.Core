@@ -15,14 +15,7 @@ pipeline {
         }
         stage('Set Build Number') {
             steps {
-                script {
-                    // Используем плагин Content Replacer для замены текста в файлах .csproj
-                    contentReplacer(
-                        files: '**/*.csproj',  // Указываем путь к файлам .csproj
-                        find: '{BuildNumber}', // Что искать
-                        replace: "${BUILD_NUMBER}" // Чем заменять (номер текущего билда)
-                    )
-                }
+                contentReplace(configs: [fileContentReplaceConfig(configs: [fileContentReplaceItemConfig(replace: '${BUILD_NUMBER}', search: 'BuildNumber')], fileEncoding: 'UTF-8', filePath: '**/*.csproj', lineSeparator: 'Unix')])
             }
         }
 
