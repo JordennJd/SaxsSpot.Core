@@ -13,18 +13,15 @@ pipeline {
                 checkout scm
             }
         }
-
         stage('Set Build Number') {
             steps {
                 script {
-                    // Этот шаг выполняет поиск и замену
-                    step([
-                        $class: 'TextFinder', 
-                        fileSet: '**/*.csproj', 
-                        searchString: '{BuildNumber}', 
-                        replaceString: "${BUILD_NUMBER}", 
-                        updateOnlyIfMatching: false
-                    ])
+                    // Используем плагин Content Replacer для замены текста в файлах .csproj
+                    contentReplacer(
+                        files: '**/*.csproj',  // Указываем путь к файлам .csproj
+                        find: '{BuildNumber}', // Что искать
+                        replace: "${BUILD_NUMBER}" // Чем заменять (номер текущего билда)
+                    )
                 }
             }
         }
