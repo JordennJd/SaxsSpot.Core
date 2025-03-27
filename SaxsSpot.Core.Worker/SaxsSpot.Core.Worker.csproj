@@ -7,19 +7,19 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="9.0.3" />
-    <PackageReference Include="Confluent.Kafka" Version="2.6.1" />
+    <PackageReference Include="Confluent.Kafka" Version="2.8.0" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="9.0.3" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.3" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="FluentValidation" Version="11.11.0" />
     <PackageReference Include="MathNet.Numerics" Version="5.0.0" />
-    <PackageReference Include="SaxsSpot.Transport.Contracts" Version="1.0.0" />
-    <PackageReference Include="SaxsSpot.Transport.MessageChannel.Contracts" Version="1.0.0" />
-    <PackageReference Include="SaxsSpot.Transport.MessageChannel.Engine" Version="1.0.0" />
-    <PackageReference Include="SaxsSpot.Transport.Receiver.Contracts" Version="1.0.0" />
-    <PackageReference Include="SaxsSpot.Transport.Receiver.Engine" Version="1.0.0" />
+    <PackageReference Include="SaxsSpot.Transport.Contracts" Version="1.0.33" />
+    <PackageReference Include="SaxsSpot.Transport.MessageChannel.Contracts" Version="1.0.33" />
+    <PackageReference Include="SaxsSpot.Transport.MessageChannel.Engine" Version="1.0.33" />
+    <PackageReference Include="SaxsSpot.Transport.Receiver.Contracts" Version="1.0.33" />
+    <PackageReference Include="SaxsSpot.Transport.Receiver.Engine" Version="1.0.33" />
     <PackageReference Include="Serilog" Version="4.2.0" />
-    <PackageReference Include="Serilog.Extensions.Logging" Version="9.0.0" />
+    <PackageReference Include="Serilog.Extensions.Logging" Version="9.0.1" />
     <PackageReference Include="Serilog.Sinks.Console" Version="6.0.0" />
     <PackageReference Include="Serilog.Sinks.File" Version="6.0.0" />
   </ItemGroup>

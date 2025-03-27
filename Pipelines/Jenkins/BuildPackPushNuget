@@ -3,43 +3,74 @@ pipeline {
 
     environment {
         DOTNET_VERSION = '9.0'
-        NUGET_SOURCE = 'https://local.devspot.tech/git/api/packages/SaxsSpot/nuget/index.json' // Или URL твоего NuGet-репозитория
+        NUGET_SOURCE = 'devspot'
+        NUGET_API_KEY = credentials('nuget-api-key')
+        CONFIG_FILE = 'lib.config'
     }
 
     stages {
-
         stage('Checkout') {
             steps {
                 checkout scm
             }
         }
+        stage('Read Config') {
+            steps {
+                script {
+                    solutions = []
+                    def configFile = readFile(env.CONFIG_FILE).trim()
+                    configFile.split('\\n').each { line ->
+                        // Проверка, чтобы игнорировать пустые строки
+                        if (line.trim()) {
+                            def parts = line.split(' ')
+                            if (parts.size() == 2) {
+                                solutions << [path: parts[0], priority: parts[1].toInteger()]
+                            }
+                        }
+                    }
+                    solutions.sort { it.priority } // Сортируем по приоритету
+                    echo "Solutions to process: ${solutions}"
+                }
+            }
+        }
+
         stage('Set Build Number') {
             steps {
-                contentReplace(configs: [fileContentReplaceConfig(configs: [fileContentReplaceItemConfig(replace: '${BUILD_NUMBER}', search: 'BuildNumber')], fileEncoding: 'UTF-8', filePath: '**/*.csproj', lineSeparator: 'Unix')])
+                contentReplace(configs: [fileContentReplaceConfig(configs: [fileContentReplaceItemConfig(replace: '<Version>1.0.${BUILD_NUMBER}</Version>', search: '<Version></Version>')], fileEncoding: 'UTF-8', filePath: '**/*.csproj', lineSeparator: 'Unix')])
             }
         }
 
-        stage('Build') {
+        stage('Process Solutions') {
             steps {
-                sh 'dotnet build --configuration Release'
-            }
-        }
+                script {
+                    solutions.each { solution ->
+                        def solutionPath = solution.path
 
-        stage('Pack') {
-            steps {
-                sh 'dotnet pack --configuration Release --output nupkgs'
-            }
-        }
+                        stage("Build ${solutionPath}") {
+                            dir(solutionPath) {
+                                sh 'dotnet build --configuration Release'
+                            }
+                        }
 
-        stage('Push to NuGet') {
-            steps {
-                withCredentials([string(credentialsId: 'nuget-api-key', variable: 'NUGET_API_KEY')]) {
-                    sh 'dotnet nuget push nupkgs/*.nupkg --source ${NUGET_SOURCE} --username DevSpot --password Lfybk2000 --skip-duplicate'
+                        stage("Pack ${solutionPath}") {
+                            dir(solutionPath) {
+                                sh 'dotnet pack --configuration Release --output nupkgs'
+                            }
+                        }
+
+                        stage("Push ${solutionPath} to NuGet") {
+                            dir(solutionPath) {
+                                withCredentials([string(credentialsId: 'nuget-api-key', variable: 'NUGET_API_KEY')]) {
+                                    sh 'dotnet nuget push nupkgs/*.nupkg --source devspot --api-key ${NUGET_API_KEY} --skip-duplicate'
+                                    sh 'rm ./nupkgs -r'
+                                }                            
+                        }
+                        }
+                    }
                 }
             }
         }
     }
-
     post {
         success {
             echo "✅ Build ${env.BUILD_NUMBER} successful!"
