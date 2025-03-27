@@ -8,6 +8,15 @@ pipeline {
     }
 
     stages {
+        stage('Use Credentials and Push to NuGet') {
+            steps {
+                script {
+                    withCredentials([string(credentialsId: 'nuget-api-key', variable: 'NUGET_API_KEY')]) {
+                        echo "${NUGET_API_KEY}"
+                    }
+                }
+            }
+        }
         stage('Checkout') {
             steps {
                 checkout scm
