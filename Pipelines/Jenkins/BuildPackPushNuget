@@ -4,19 +4,10 @@ pipeline {
     environment {
         DOTNET_VERSION = '9.0'
         NUGET_SOURCE = 'https://local.devspot.tech/git/api/packages/SaxsSpot/nuget/index.json' // Или URL твоего NuGet-репозитория
-        NUGET_API_KEY = credentials('nuget-api-key')  // Убедись, что API-ключ добавлен в Jenkins Credentials
     }
 
     stages {
-        stage('Use Credentials and Push to NuGet') {
-            steps {
-                script {
-                    withCredentials([string(credentialsId: 'nuget-api-key', variable: 'NUGET_API_KEY')]) {
-                        echo "${NUGET_API_KEY}"
-                    }
-                }
-            }
-        }
+
         stage('Checkout') {
             steps {
                 checkout scm
@@ -42,7 +33,9 @@ pipeline {
 
         stage('Push to NuGet') {
             steps {
-                sh 'dotnet nuget push nupkgs/*.nupkg --source ${NUGET_SOURCE} --api-key ${NUGET_API_KEY} --skip-duplicate'
+                withCredentials([string(credentialsId: 'nuget-api-key', variable: 'NUGET_API_KEY')]) {
+                    sh 'dotnet nuget push nupkgs/*.nupkg --source ${NUGET_SOURCE} --username DevSpot --password Lfybk2000 --skip-duplicate'
+                }
             }
         }
     }
