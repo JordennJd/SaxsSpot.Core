@@ -45,7 +45,7 @@ pipeline {
                 withCredentials([string(credentialsId: 'nuget-api-key', variable: 'NUGET_API_KEY')]) {
                     sh '''
                         dotnet nuget add source https://local.devspot.tech/git/api/packages/SaxsSpot/nuget/index.json \
-                            --name saxscalc \
+                            --name ${NUGET_SOURCE} \
                             --username Jordenn \
                             --password $NUGET_API_KEY \
                             --store-password-in-clear-text \
@@ -70,7 +70,7 @@ pipeline {
                         stage("Push ${solutionPath} to NuGet") {
                             dir(solutionPath) {
                                 withCredentials([string(credentialsId: 'nuget-api-key', variable: 'NUGET_API_KEY')]) {
-                                    sh 'dotnet nuget push nupkgs/*.nupkg --source saxsspot --api-key ${NUGET_API_KEY} --skip-duplicate'
+                                    sh 'dotnet nuget push nupkgs/*.nupkg --source ${NUGET_SOURCE} --api-key ${NUGET_API_KEY} --skip-duplicate'
                                     sh 'rm ./nupkgs -r'
                                 }                            
                         }
