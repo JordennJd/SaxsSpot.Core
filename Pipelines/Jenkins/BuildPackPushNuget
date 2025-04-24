@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         DOTNET_VERSION = '9.0'
-        NUGET_SOURCE = 'devspot'
+        NUGET_SOURCE = 'saxscalc'
         NUGET_API_KEY = credentials('nuget-api-key')
         CONFIG_FILE = 'lib.config'
     }
@@ -42,6 +42,14 @@ pipeline {
 
         stage('Process Solutions') {
             steps {
+                script("add nuget source") {
+                    stage("Build ${solutionPath}") {
+                        dir(solutionPath) {
+                            sh 'dotnet nuget add source https://api.nuget.org/v3/index.json -n saxscalc -u Jordenn -p ${NUGET_API_KEY} --allow-insecure-connections'
+                        }
+                    }
+                }
+
                 script {
                     solutions.each { solution ->
                         def solutionPath = solution.path
