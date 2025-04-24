@@ -44,11 +44,15 @@ pipeline {
             steps {
                 withCredentials([string(credentialsId: 'nuget-api-key', variable: 'NUGET_API_KEY')]) {
                     sh '''
-                        dotnet nuget add source https://local.devspot.tech/git/api/packages/SaxsSpot/nuget/index.json \
-                            --name ${NUGET_SOURCE} \
+                    if ! dotnet nuget list source | grep -q "saxscalc"; then
+                        dotnet nuget add source https://api.nuget.org/v3/index.json \
+                            --name saxscalc \
                             --username Jordenn \
                             --password $NUGET_API_KEY \
-                            --store-password-in-clear-text \
+                            --store-password-in-clear-text
+                    else
+                        echo "NuGet source 'saxscalc' already exists. Skipping add."
+                    fi
                     '''
                 }
                 script {
