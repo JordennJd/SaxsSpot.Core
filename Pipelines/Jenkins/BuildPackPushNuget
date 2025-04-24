@@ -42,10 +42,16 @@ pipeline {
 
         stage('Process Solutions') {
             steps {
-                script("add nuget source") {
-                    sh 'dotnet nuget add source https://api.nuget.org/v3/index.json -n saxscalc -u Jordenn -p ${NUGET_API_KEY} --allow-insecure-connections'
+                withCredentials([string(credentialsId: 'nuget-api-key', variable: 'NUGET_API_KEY')]) {
+                    sh '''
+                        dotnet nuget add source https://api.nuget.org/v3/index.json \
+                            --name saxscalc \
+                            --username Jordenn \
+                            --password $NUGET_API_KEY \
+                            --store-password-in-clear-text \
+                            --configfile NuGet.Config
+                    '''
                 }
-
                 script {
                     solutions.each { solution ->
                         def solutionPath = solution.path
