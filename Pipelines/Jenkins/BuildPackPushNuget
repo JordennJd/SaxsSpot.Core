@@ -61,7 +61,7 @@ pipeline {
                         stage("Push ${solutionPath} to NuGet") {
                             dir(solutionPath) {
                                 withCredentials([string(credentialsId: 'nuget-api-key', variable: 'NUGET_API_KEY')]) {
-                                    sh 'dotnet nuget push nupkgs/*.nupkg --source devspot --api-key ${NUGET_API_KEY} --skip-duplicate'
+                                    sh 'dotnet nuget push nupkgs/*.nupkg --source saxsspot --api-key ${NUGET_API_KEY} --skip-duplicate'
                                     sh 'rm ./nupkgs -r'
                                 }                            
                         }
