@@ -8,7 +8,7 @@ public interface IGenericStorage<TEntity> where TEntity : class
     
     Task<IEnumerable<TEntity>> WhereAsync(Expression<Func<TEntity, bool>> expression);
     
-    Task UpdateOrInsertAsync(TEntity nanoSystem);
+    Task UpdateOrInsertAsync(TEntity entity);
 
     Task DeleteAsync(long[] ids);
 }
