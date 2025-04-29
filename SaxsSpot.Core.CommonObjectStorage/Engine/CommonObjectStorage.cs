@@ -21,33 +21,33 @@ public abstract class CommonObjectStorage<T> : ICommonObjectStorage<T>
             .Build();
         
         _bucketName = minioConfig["bucketName"];
+        
+        var found = _minioClient.BucketExistsAsync(new BucketExistsArgs().WithBucket(_bucketName)).Result;
+        if (!found)
+        {
+            _minioClient.MakeBucketAsync(new MakeBucketArgs().WithBucket(_bucketName)).Wait();
+        }
     }
     
     public async Task Save(IEnumerable<T> data, Guid objectId)
     {
-        string objectName = $"{objectId}";
+        var objectName = $"{objectId}";
         
         await using var stream = GetStream(data);
         stream.Position = 0;
-        
-        bool found = await _minioClient.BucketExistsAsync(new BucketExistsArgs().WithBucket(_bucketName));
-        if (!found)
-        {
-            await _minioClient.MakeBucketAsync(new MakeBucketArgs().WithBucket(_bucketName));
-        }
 
         await _minioClient.PutObjectAsync(new PutObjectArgs()
             .WithBucket(_bucketName)
             .WithObject(objectName)
             .WithStreamData(stream)
-            .WithObjectSize(stream.Length)
-            .WithContentType("application/json"));
+            .WithObjectSize(stream.Length))
+            .ConfigureAwait(false);
     }
     
 
     public async IAsyncEnumerable<T> Load(Guid objectId)
     {
-        string objectName = $"{objectId}";
+        var objectName = $"{objectId}";
         using var stream = new MemoryStream();
 
         // Download the file
