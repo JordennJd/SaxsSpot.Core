@@ -18,9 +18,9 @@ public abstract class GenericStorage<TEntity> : IGenericStorage<TEntity> where T
         return await _dbContext.Entities.FirstOrDefaultAsync(expression);
     }
 
-    public Task<IEnumerable<TEntity>> WhereAsync(Expression<Func<TEntity, bool>> expression)
+    public async Task<IEnumerable<TEntity>> WhereAsync(Expression<Func<TEntity, bool>> expression)
     {
-        throw new NotImplementedException();
+        return await _dbContext.Entities.Where(expression).ToListAsync();
     }
 
     public async Task UpdateOrInsertAsync(TEntity entity)
