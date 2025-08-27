@@ -1,4 +1,5 @@
 using System.IO.Pipelines;
+using System.Runtime.CompilerServices;
 using Microsoft.Extensions.Configuration;
 using Minio;
 using Minio.DataModel.Args;
@@ -46,30 +47,34 @@ public abstract class CommonObjectStorage<T> : ICommonObjectStorage<T>
     }
     
 
-    public async IAsyncEnumerable<T> Load(Guid objectId, CancellationToken cancellationToken = default)
+    public async IAsyncEnumerable<T> Load(Guid objectId, [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
         var objectName = $"{objectId}";
     
-        var pipe = new Pipe();
+        var tempFilePath = Path.GetTempFileName();
     
-        var downloadTask = Task.Run(async () =>
+        try
         {
             await _minioClient.GetObjectAsync(new GetObjectArgs()
                 .WithBucket(_bucketName)
                 .WithObject(objectName)
-                .WithCallbackStream(async sourceStream =>
-                {
-                    await sourceStream.CopyToAsync(pipe.Writer.AsStream(), cancellationToken);
-                    await pipe.Writer.CompleteAsync();
-                }), cancellationToken);
-        }, cancellationToken);
+                .WithFile(tempFilePath), cancellationToken);
 
-        await foreach (var item in FromStreamAsync(pipe.Reader.AsStream()).WithCancellation(cancellationToken))
-        {
-            yield return item;
+            await using var fileStream = new FileStream(tempFilePath, FileMode.Open, FileAccess.Read, FileShare.Read,
+                4096, FileOptions.DeleteOnClose | FileOptions.Asynchronous);
+        
+            await foreach (var item in FromStreamAsync(fileStream).WithCancellation(cancellationToken))
+            {
+                yield return item;
+            }
         }
-
-        await downloadTask;
+        finally
+        {
+            if (File.Exists(tempFilePath))
+            {
+                File.Delete(tempFilePath);
+            }
+        }
     }
 
     public Task Delete(Guid objectId)
