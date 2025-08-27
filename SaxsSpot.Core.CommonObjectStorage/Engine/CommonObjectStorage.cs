@@ -1,3 +1,4 @@
+using System.IO.Pipelines;
 using Microsoft.Extensions.Configuration;
 using Minio;
 using Minio.DataModel.Args;
@@ -45,24 +46,30 @@ public abstract class CommonObjectStorage<T> : ICommonObjectStorage<T>
     }
     
 
-    public async IAsyncEnumerable<T> Load(Guid objectId)
+    public async IAsyncEnumerable<T> Load(Guid objectId, CancellationToken cancellationToken = default)
     {
         var objectName = $"{objectId}";
-        using var stream = new MemoryStream();
+    
+        var pipe = new Pipe();
+    
+        var downloadTask = Task.Run(async () =>
+        {
+            await _minioClient.GetObjectAsync(new GetObjectArgs()
+                .WithBucket(_bucketName)
+                .WithObject(objectName)
+                .WithCallbackStream(async sourceStream =>
+                {
+                    await sourceStream.CopyToAsync(pipe.Writer.AsStream(), cancellationToken);
+                    await pipe.Writer.CompleteAsync();
+                }), cancellationToken);
+        }, cancellationToken);
 
-        // Download the file
-        await _minioClient.GetObjectAsync(new GetObjectArgs()
-            .WithBucket(_bucketName)
-            .WithObject(objectName)
-            .WithCallbackStream(s => s.CopyTo(stream)));
-
-        // Deserialize and return the data
-        stream.Seek(0, SeekOrigin.Begin);
-
-        foreach (var item in FromStream(stream))
+        await foreach (var item in FromStreamAsync(pipe.Reader.AsStream()).WithCancellation(cancellationToken))
         {
             yield return item;
         }
+
+        await downloadTask;
     }
 
     public Task Delete(Guid objectId)
@@ -72,5 +79,5 @@ public abstract class CommonObjectStorage<T> : ICommonObjectStorage<T>
 
     protected abstract Stream GetStream(IEnumerable<T> data);
 
-    protected abstract IEnumerable<T> FromStream(Stream data);
+    protected abstract IAsyncEnumerable<T> FromStreamAsync(Stream data);
 }
