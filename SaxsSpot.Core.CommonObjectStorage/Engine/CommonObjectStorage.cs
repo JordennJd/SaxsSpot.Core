@@ -47,7 +47,7 @@ public abstract class CommonObjectStorage<T> : ICommonObjectStorage<T>
     }
     
 
-    public async IAsyncEnumerable<T> Load(Guid objectId, [EnumeratorCancellation] CancellationToken cancellationToken = default)
+    public async IAsyncEnumerable<T> Load(Guid objectId, [EnumeratorCancellation] CancellationToken cancellationToken)
     {
         var objectName = $"{objectId}";
     
