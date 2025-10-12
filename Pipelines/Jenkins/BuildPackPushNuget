@@ -4,8 +4,10 @@ pipeline {
     environment {
         DOTNET_VERSION = '9.0'
         NUGET_SOURCE = 'saxscalc'
-        NUGET_API_KEY = credentials('nuget-api-key')
-        CONFIG_FILE = 'lib.config'
+        NUGET_API_KEY = credentials('gitea-token')
+        SOLUTION_PATH = './'
+        NUGET_REPO = 'https://local.devspot.tech/git/api/packages/SaxsSpot/nuget/index.json'
+        GIT_REPO = 'local.devspot.tech/git/SaxsSpot/SaxsSpot.Shared.git'
     }
 
     stages {
@@ -14,29 +16,47 @@ pipeline {
                 checkout scm
             }
         }
-        stage('Read Config') {
+
+        stage('Check Version') {
             steps {
                 script {
-                    solutions = []
-                    def configFile = readFile(env.CONFIG_FILE).trim()
-                    configFile.split('\\n').each { line ->
-                        // Проверка, чтобы игнорировать пустые строки
-                        if (line.trim()) {
-                            def parts = line.split(' ')
-                            if (parts.size() == 2) {
-                                solutions << [path: parts[0], priority: parts[1].toInteger()]
-                            }
-                        }
+                    def version = readFile('component_version').trim()
+                    def tagName = "component-v${version}"
+
+                    sh "git fetch --tags"
+                    def tagExists = sh(script: "git tag --list '${tagName}'", returnStdout: true).trim()
+
+                    if (tagExists) {
+                        echo "Version ${version} already exists as Git tag (${tagName}). Skipping build."
+                        currentBuild.result = 'NOT_BUILT'
+                        error("Build skipped: version unchanged.")
+                    } else {
+                        echo "New version detected: ${version}"
+                        env.BUILD_VERSION = version
+                        env.VERSION_TAG = tagName
                     }
-                    solutions.sort { it.priority } // Сортируем по приоритету
-                    echo "Solutions to process: ${solutions}"
                 }
             }
         }
 
         stage('Set Build Number') {
             steps {
-                contentReplace(configs: [fileContentReplaceConfig(configs: [fileContentReplaceItemConfig(replace: '<Version>1.0.${BUILD_NUMBER}</Version>', search: '<Version></Version>')], fileEncoding: 'UTF-8', filePath: '**/*.csproj', lineSeparator: 'Unix')])
+                script {
+                    def version = env.BUILD_VERSION
+                    contentReplace(configs: [
+                        fileContentReplaceConfig(
+                            configs: [
+                                fileContentReplaceItemConfig(
+                                    replace: "<Version>${version}</Version>",
+                                    search: '<Version></Version>'
+                                )
+                            ],
+                            fileEncoding: 'UTF-8',
+                            filePath: '**/*.csproj',
+                            lineSeparator: 'Unix'
+                        )
+                    ])
+                }
             }
         }
 
@@ -45,9 +65,9 @@ pipeline {
                 withCredentials([string(credentialsId: 'nuget-api-key', variable: 'NUGET_API_KEY')]) {
                     sh '''
                     if ! dotnet nuget list source | grep -q "saxscalc"; then
-                        dotnet nuget add source https://api.nuget.org/v3/index.json \
-                            --name saxscalc \
-                            --username Jordenn \
+                        dotnet nuget add source $NUGET_REPO \
+                            --name $NUGET_SOURCE \
+                            --username Jenkins \
                             --password $NUGET_API_KEY \
                             --store-password-in-clear-text
                     else
@@ -55,38 +75,58 @@ pipeline {
                     fi
                     '''
                 }
+
                 script {
-                    solutions.each { solution ->
-                        def solutionPath = solution.path
+                    stage("Clear output directory nupkgs") {
+                        dir(SOLUTION_PATH) {
+                            sh 'rm -rf ./nupkgs'
+                        }
+                    }
 
-                        stage("Build ${solutionPath}") {
-                            dir(solutionPath) {
-                                sh 'dotnet build --configuration Release'
+                    stage("Build ${SOLUTION_PATH}") {
+                        dir(SOLUTION_PATH) {
+                            sh 'dotnet build --configuration Release'
+                        }
+                    }
+
+                    stage("Pack ${SOLUTION_PATH}") {
+                        dir(SOLUTION_PATH) {
+                            sh 'dotnet pack --configuration Release --output nupkgs'
+                        }
+                    }
+
+                    stage("Push ${SOLUTION_PATH} to NuGet") {
+                        dir(SOLUTION_PATH) {
+                            withCredentials([string(credentialsId: 'nuget-api-key', variable: 'NUGET_API_KEY')]) {
+                                sh 'dotnet nuget push nupkgs/*.nupkg --source ${NUGET_SOURCE} --api-key ${NUGET_API_KEY} --skip-duplicate'
+                                sh 'rm -rf ./nupkgs'
                             }
-                        }
-
-                        stage("Pack ${solutionPath}") {
-                            dir(solutionPath) {
-                                sh 'dotnet pack --configuration Release --output nupkgs'
-                            }
-                        }
-
-                        stage("Push ${solutionPath} to NuGet") {
-                            dir(solutionPath) {
-                                withCredentials([string(credentialsId: 'nuget-api-key', variable: 'NUGET_API_KEY')]) {
-                                    sh 'dotnet nuget push nupkgs/*.nupkg --source ${NUGET_SOURCE} --api-key ${NUGET_API_KEY} --skip-duplicate'
-                                    sh 'rm ./nupkgs -r'
-                                }                            
-                        }
                         }
                     }
                 }
             }
         }
+
+        stage('Tag Version in Git') {
+            steps {
+                script {
+                    withCredentials([usernamePassword(credentialsId: 'gitea-token', usernameVariable: 'GIT_USER', passwordVariable: 'GIT_TOKEN')]) {
+                        sh """
+                            git remote set-url origin https://${GIT_USER}:${GIT_TOKEN}@${GIT_REPO}
+                            git config user.name "jenkins"
+                            git config user.email "jenkins@local"
+                            git tag ${VERSION_TAG}
+                            git push origin ${VERSION_TAG}
+                        """
+                    }
+                }
+            }
+        }
     }
+
     post {
         success {
-            echo "✅ Build ${env.BUILD_NUMBER} successful!"
+            echo "✅ Build ${env.BUILD_NUMBER} (${env.BUILD_VERSION}) successful!"
         }
         failure {
             echo "❌ Build failed!"
